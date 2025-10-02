@@ -22,3 +22,8 @@ app.use('/api/users', userRoutes);
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+app.use(cors({
+  origin: 'https://tanbeeh-dashboard-frontend.vercel.app/',
+  credentials: true,
+}));
