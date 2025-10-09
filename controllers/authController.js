@@ -74,6 +74,8 @@ export const login = (req, res) => {
     }
 
     try {
+      console.log('Login attempt with TR:', trNumberInt);
+
       const match = await bcrypt.compare(password, user.password_hash);
       if (!match) {
         return res.status(401).json({ error: 'Invalid password' });
