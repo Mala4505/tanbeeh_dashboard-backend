@@ -56,8 +56,9 @@ export const login = (req, res) => {
   if (!trNumber || !password) {
     return res.status(400).json({ error: 'TR number and password are required' });
   }
-
+  
   const trNumberInt = Number(trNumber);
+  console.log('Login attempt with TR:', trNumberInt);
   if (isNaN(trNumberInt)) {
     return res.status(400).json({ error: 'Invalid TR number format' });
   }
@@ -74,7 +75,6 @@ export const login = (req, res) => {
     }
 
     try {
-      console.log('Login attempt with TR:', trNumberInt);
 
       const match = await bcrypt.compare(password, user.password_hash);
       if (!match) {
