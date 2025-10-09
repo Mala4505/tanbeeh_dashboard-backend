@@ -38,10 +38,21 @@ dotenv.config();
 const app = express();
 
 // ✅ CORS must come BEFORE routes
+// app.use(cors({
+//   origin: 'https://tanbeeh-dashboard-frontend.vercel.app',
+//   credentials: true,
+// }));
+
 app.use(cors({
-  origin: 'https://tanbeeh-dashboard-frontend.vercel.app',
+  origin: 'https://tanbeeh-dashboard-frontend.vercel.app', // ✅ no trailing slash
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }));
+
+// ✅ Mount routes
+app.use('/api', authRoutes);
+app.use('/api/users', userRoutes);
 
 app.use(express.json());
 
@@ -51,9 +62,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// ✅ Mount routes
-app.use('/api', authRoutes);
-app.use('/api/users', userRoutes);
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
