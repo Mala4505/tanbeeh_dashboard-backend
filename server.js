@@ -50,11 +50,11 @@ app.use(cors({
   credentials: true,
 }));
 
+app.use(express.json());
 // ✅ Mount routes
 app.use('/api', authRoutes);
 app.use('/api/users', userRoutes);
 
-app.use(express.json());
 
 // ✅ Global request logger
 app.use((req, res, next) => {
