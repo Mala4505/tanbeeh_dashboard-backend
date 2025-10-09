@@ -49,6 +49,8 @@ dotenv.config();
 // 🔐 POST /api/login
 export const login = (req, res) => {
   const { trNumber, password } = req.body;
+  console.log('Incoming login request:', req.body);
+
 
   // Validate input
   if (!trNumber || !password) {
