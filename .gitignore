@@ -1,0 +1,20 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Django database
+db.sqlite3
+
+# Environment variables
+.env
+
+# Migrations
+*/migrations/
+*/migrations/*.py
+*/migrations/*.pyc
+
+# VS Code settings (optional)
+.vscode/
+
+# OS-specific
+.DS_Store

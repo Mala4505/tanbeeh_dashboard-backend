@@ -1,12 +1,14 @@
 from pathlib import Path
+import os
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-SECRET_KEY = 'django-insecure-4au&^qvw0)a@@ncg4*m!5v=wz*==g8mtrdevy_8$je4%6$z5rf'
-DEBUG = True
+SECRET_KEY = os.environ.get('SECRET_KEY', 'fallback-secret-for-dev')
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 
 
 # Application definition
