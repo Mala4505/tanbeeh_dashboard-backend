@@ -1,14 +1,14 @@
 services:
   - type: web
-    name: backend
+    name: tanbeeh-backend
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn backend.wsgi:application
     autoDeploy: true
     envVars:
       - key: SECRET_KEY
-        value: Tanbeeh-Dashboard
+        value: your-secret-key
       - key: DEBUG
         value: False
       - key: ALLOWED_HOSTS
-        value: tanbeeh-dashboard-frontend.vercel.app,render.com
+        value: tanbeeh-backend.onrender.com
