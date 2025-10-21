@@ -10,7 +10,7 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 # ALLOWED_HOSTS = ['*']
-ALLOWED_HOSTS = ['tanbeeh-dashboard-backend.onrender.com']
+ALLOWED_HOSTS = ['https://tanbeeh-dashboard-backend.onrender.com']
 
 
 # Application definition
