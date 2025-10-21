@@ -10,7 +10,7 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 # ALLOWED_HOSTS = ['*']
-ALLOWED_HOSTS = ['https://tanbeeh-dashboard-backend.onrender.com']
+ALLOWED_HOSTS = ['tanbeeh-dashboard-backend.onrender.com']
 
 
 # Application definition
@@ -22,12 +22,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'login',
-    'corsheaders'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -35,10 +36,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware'
 ]
 
-CORS_ALLOW_CREDENTIALS = True
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -49,6 +48,7 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL = 'login.User'
 
 CORS_ALLOWED_ORIGINS = ['https://tanbeeh-dashboard-frontend.vercel.app']
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'backend.urls'
 
