@@ -5,6 +5,9 @@ from rest_framework.permissions import IsAuthenticated
 from django.utils.timezone import now
 from datetime import date, timedelta
 
+import logging
+logger = logging.getLogger(__name__)
+
 from .models import (
     Student,
     AttendanceRecord,
@@ -49,7 +52,7 @@ class UserManagementView(APIView):
 # --- Attendance Fetching ---
 class AttendanceBaseView(APIView):
     permission_classes = [IsAuthenticated]
-    attendance_key = None  # override in subclasses
+    attendance_key = None
 
     def get(self, request):
         today = date.today()
@@ -59,13 +62,43 @@ class AttendanceBaseView(APIView):
 
         raw_data = fetch_attendance(self.attendance_key, frm, to, token)
         combined = [normalize_student_attendance(row, self.attendance_key) for row in raw_data]
+
+        # Assign an internal record serial id for each row (stable within this response)
         filtered = filter_by_role(request.user, combined)
+        for idx, row in enumerate(filtered, start=1):
+            # only set id if not already present; ensures deterministic serials
+            row.setdefault("id", idx)
 
         return Response({"attendance": filtered})
 
 
+# class FajrAttendanceView(AttendanceBaseView):
+#     attendance_key = "Fajr_Namaz_Talabat"
+
 class FajrAttendanceView(AttendanceBaseView):
     attendance_key = "Fajr_Namaz_Talabat"
+
+    def get(self, request):
+        today = date.today()
+        frm = (today - timedelta(days=30)).strftime("%Y-%m-%d")
+        to = today.strftime("%Y-%m-%d")
+        token = "c701a5a2-f53f-4ca3-86e4-2a85657066bc"
+
+        raw_data = fetch_attendance(self.attendance_key, frm, to, token)
+        logger.info("Raw data sample: %s", raw_data[:3])  # log first 3 rows
+
+        combined = [normalize_student_attendance(row, self.attendance_key) for row in raw_data]
+        logger.info("Normalized sample: %s", combined[:3])
+
+        filtered = filter_by_role(request.user, combined)
+        logger.info("Filtered sample: %s", filtered[:3])
+        # return Response({"attendance": filtered})
+        return Response({
+            # "raw_data": raw_data[:5],        # first 5 raw rows
+            # "normalized": combined[:5],      # first 5 normalized rows
+            "attendance": filtered           # full filtered attendance
+        })
+
 
 
 class MaghribAttendanceView(AttendanceBaseView):

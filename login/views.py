@@ -6,8 +6,10 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
+from rest_framework.generics import RetrieveAPIView
 
 from .models import CustomUser
+from .serializers import *
 from attendance.models import AuditLog
 from attendance.permissions import IsAdmin
 
@@ -198,3 +200,16 @@ class AdminResetPasswordView(APIView):
         )
 
         return Response({"message": f"Password reset successfully for {target_user.username}"}, status=200)
+
+
+class ProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        return Response({
+            "id": user.id,
+            "its_number": getattr(user, "its_number", None),
+            "name": getattr(user, "name", getattr(user, "username", None)),
+            "role": getattr(user, "role", None),
+        })

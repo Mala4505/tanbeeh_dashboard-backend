@@ -40,8 +40,11 @@ class CustomUser(AbstractUser):
     is_verified = models.BooleanField(default=False)  # Admin can mark user as verified
     is_active = models.BooleanField(default=True)     # Standard Django field, but explicitly kept
 
+    USERNAME_FIELD = "its_number"
+    REQUIRED_FIELDS = ["username", "role"]
+    
     def __str__(self):
-        return f"{self.username} ({self.role})"
+        return f"{self.username} ({self.its_number})"
 
     @property
     def full_name(self):
