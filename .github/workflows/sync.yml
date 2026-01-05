@@ -2,9 +2,9 @@ name: Daily Attendance Sync
 
 on:
   schedule:
-    # Run daily at 20:00 Nairobi time (EAT = UTC+3)
-    - cron: "0 06 * * *"   # 17:00 UTC = 20:00 EAT
-  workflow_dispatch:       # allow manual trigger
+    # Run daily at 9:00 AM Nairobi time (EAT = UTC+3)
+    - cron: "0 6 * * *"   # 06:00 UTC = 09:00 EAT
+  workflow_dispatch:       # allow manual trigger from GitHub UI
 
 jobs:
   sync:
@@ -30,8 +30,7 @@ jobs:
 
       - name: Run attendance sync
         env:
-          DJANGO_SETTINGS_MODULE: backend.settings
-          # Add any secrets here, e.g. Supabase credentials
+          DJANGO_SETTINGS_MODULE: backend.settings   # replace with your Django settings module
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: |
