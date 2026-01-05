@@ -70,12 +70,13 @@ class Command(BaseCommand):
                 student=student,
                 date=rec.get("date"),
                 attendance_type=rec["attendance_type"],
+                tp=rec.get("tp"),   # <-- add this if tp is unique per record
                 defaults={
                     "status": rec["status"],
-                    "remarks": rec["remarks"],
-                    "tp": rec.get("tp"),
+                    "remarks": rec.get("remarks"),
                 }
             )
+
             if created:
                 records_created += 1
                 self.stdout.write(
