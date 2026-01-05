@@ -1,62 +1,3 @@
-# from django.db import models
-# from django.conf import settings
-
-# class Student(models.Model):
-#     trno = models.CharField(max_length=50, unique=True)   # ITS/TRNO from API
-#     bed_name = models.CharField(max_length=100, null=True, blank=True)
-#     room = models.CharField(max_length=50, null=True, blank=True)
-#     pantry = models.CharField(max_length=50, null=True, blank=True)
-#     location = models.CharField(max_length=100, null=True, blank=True)
-#     darajah = models.CharField(max_length=50, null=True, blank=True)
-#     hizb = models.CharField(max_length=50, null=True, blank=True)
-
-#     def __str__(self):
-#         return f"{self.trno} - {self.bed_name or ''}"
-
-
-# class AttendanceRecord(models.Model):
-#     ATTENDANCE_TYPES = (
-#         ("fajr", "Fajr"),
-#         ("maghrib_isha", "Maghrib & Isha"),
-#         ("dua", "Du'a"),
-#     )
-
-#     STATUS_CHOICES = (
-#         ("present", "Present"),
-#         ("absent", "Absent"),
-#         ("late", "Late"),
-#         ("excused", "Excused"),
-#     )
-
-#     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="attendance_records")
-#     date = models.DateField()
-#     attendance_type = models.CharField(max_length=20, choices=ATTENDANCE_TYPES)
-#     status = models.CharField(max_length=20, choices=STATUS_CHOICES)
-#     remarks = models.TextField(null=True, blank=True)
-
-#     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
-
-#     class Meta:
-#         unique_together = ("student", "date", "attendance_type")
-
-#     def __str__(self):
-#         return f"{self.student.trno} - {self.date} - {self.attendance_type} ({self.status})"
-
-
-# class AttendanceFlag(models.Model):
-#     """
-#     Separate table to track flags on attendance records.
-#     Allows multiple flags per record, with reasons and who flagged it.
-#     """
-#     attendance_record = models.ForeignKey(AttendanceRecord, on_delete=models.CASCADE, related_name="flags")
-#     flagged_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
-#     reason = models.TextField(null=True, blank=True)
-#     created_at = models.DateTimeField(auto_now_add=True)
-
-#     def __str__(self):
-#         return f"Flag on {self.attendance_record} by {self.flagged_by} ({self.created_at.date()})"
-
-
 from django.db import models
 from django.conf import settings
 
@@ -89,7 +30,8 @@ class AttendanceRecord(models.Model):
     )
 
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="attendance_records")
-    date = models.DateField()
+    date = models.DateField(null=True, blank=True)
+    tp = models.TimeField(null=True, blank=True)  # prayer time from prayer endpoints
     attendance_type = models.CharField(max_length=20, choices=ATTENDANCE_TYPES)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES)
     remarks = models.TextField(null=True, blank=True)
@@ -100,7 +42,14 @@ class AttendanceRecord(models.Model):
     is_temp = models.BooleanField(default=False)
 
     class Meta:
-        unique_together = ("student", "date", "attendance_type")
+        constraints = [
+            models.UniqueConstraint(fields=["student", "date", "attendance_type"], name="unique_attendance_record")
+        ]
+        indexes = [
+            models.Index(fields=["date", "attendance_type"]),
+            models.Index(fields=["status"]),
+            models.Index(fields=["-date"]),
+        ]
 
     def __str__(self):
         return f"{self.student.trno} - {self.date} - {self.attendance_type} ({self.status})"
@@ -117,7 +66,6 @@ class AttendanceFlag(models.Model):
     reason = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    # Assigned Lajnat Member responsible for flagged student
     assigned_to = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -133,7 +81,6 @@ class AttendanceFlag(models.Model):
 class AuditLog(models.Model):
     """
     Records all important actions for accountability.
-    Examples: flagging, unflagging, login, logout, password change, data view.
     """
     ACTION_CHOICES = (
         ("flag", "Flagged student"),
@@ -148,8 +95,8 @@ class AuditLog(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     action = models.CharField(max_length=50, choices=ACTION_CHOICES)
-    target = models.CharField(max_length=255, null=True, blank=True)  # e.g., student TRNO or record ID
-    metadata = models.JSONField(null=True, blank=True)  # extra context
+    target = models.CharField(max_length=255, null=True, blank=True)
+    metadata = models.JSONField(null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -159,7 +106,6 @@ class AuditLog(models.Model):
 class Notification(models.Model):
     """
     Alerts for flagged students or other role-based events.
-    Typically sent to Lajnat Members when a student is flagged.
     """
     recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications")
     message = models.TextField()
@@ -170,8 +116,6 @@ class Notification(models.Model):
     def __str__(self):
         return f"Notification for {self.recipient} - {self.message[:30]}..."
 
-
-# Assignment tables
 
 class HizbAssignment(models.Model):
     """
@@ -199,7 +143,6 @@ class MasoolAssignment(models.Model):
 class MuaddibGroup(models.Model):
     """
     Each Hizb can have multiple Muaddib groups.
-    Each group is assigned to one Muaddib and contains multiple students.
     """
     hizb = models.CharField(max_length=50)
     muaddib = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="muaddib_groups")
@@ -212,7 +155,6 @@ class MuaddibGroup(models.Model):
 class LajnatAssignment(models.Model):
     """
     Many Lajnat Members, each assigned to multiple students.
-    Flagged students are routed here.
     """
     lajnat_member = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="lajnat_assignments")
     students = models.ManyToManyField(Student, related_name="lajnat_students")

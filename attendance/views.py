@@ -37,7 +37,7 @@ from .permissions import (
     IsAuditViewer,
 )
 from .services.university_api import fetch_attendance
-from .utils.normalizer import normalize_student_attendance
+from .utils.normalizers import normalize_student_attendance
 from .utils.filters import filter_by_role
 
 
