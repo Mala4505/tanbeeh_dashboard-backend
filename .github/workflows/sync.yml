@@ -30,7 +30,7 @@ jobs:
 
       - name: Run attendance sync
         env:
-          DJANGO_SETTINGS_MODULE: yourproject.settings   # replace with your Django settings module
+          DJANGO_SETTINGS_MODULE: backend.settings   # replace with your Django settings module
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: |
