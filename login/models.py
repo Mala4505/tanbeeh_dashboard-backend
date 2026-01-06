@@ -41,10 +41,10 @@ class CustomUser(AbstractUser):
     is_active = models.BooleanField(default=True)     # Standard Django field, but explicitly kept
 
     USERNAME_FIELD = "its_number"
-    REQUIRED_FIELDS = ["username", "role"]
+    REQUIRED_FIELDS = ["role"]
     
     def __str__(self):
-        return f"{self.username} ({self.its_number})"
+        return f"({self.its_number})"
 
     @property
     def full_name(self):

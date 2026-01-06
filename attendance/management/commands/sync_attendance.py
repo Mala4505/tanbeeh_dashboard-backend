@@ -3,7 +3,7 @@ from attendance.utils.normalizers import (
     fetch_and_normalize,
     normalize_student_attendance,
 )
-from attendance.models import AttendanceRecord, Student
+from attendance.models import AttendanceRecord, Student, Darajah, Hizb
 from datetime import date, timedelta
 
 
@@ -46,16 +46,25 @@ class Command(BaseCommand):
                 f"Processing student {rec['trno']} with status {rec['status']} and tp {rec['tp']}"
             )
 
+            # Look up related objects safely
+            darajah_obj = None
+            hizb_obj = None
+
+            if rec.get("darajah"):
+                darajah_obj = Darajah.objects.filter(name=rec["darajah"]).first()
+            if rec.get("hizb"):
+                hizb_obj = Hizb.objects.filter(name=rec["hizb"]).first()
+
             # Create or update Student
             student, created = Student.objects.update_or_create(
                 trno=rec["trno"],
                 defaults={
-                    "room": rec["room"],
-                    "pantry": rec["pantry"],
-                    "location": rec["location"],
-                    "darajah": rec["darajah"],
-                    "hizb": rec["hizb"],
-                    "bed_name": rec["bed_name"],
+                    "room": rec.get("room"),
+                    "pantry": rec.get("pantry"),
+                    "location": rec.get("location"),
+                    "darajah": darajah_obj,   # assign FK instance
+                    "hizb": hizb_obj,         # assign FK instance
+                    "bed_name": rec.get("bed_name"),
                 }
             )
             if created:
@@ -70,7 +79,7 @@ class Command(BaseCommand):
                 student=student,
                 date=rec.get("date"),
                 attendance_type=rec["attendance_type"],
-                tp=rec.get("tp"),   # <-- add this if tp is unique per record
+                tp=rec.get("tp"),
                 defaults={
                     "status": rec["status"],
                     "remarks": rec.get("remarks"),
