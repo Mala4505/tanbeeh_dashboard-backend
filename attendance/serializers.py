@@ -1,16 +1,6 @@
 from rest_framework import serializers
 from django.conf import settings
-from .models import (
-    Student,
-    AttendanceRecord,
-    AttendanceFlag,
-    AuditLog,
-    Notification,
-    HizbAssignment,
-    MasoolAssignment,
-    MuaddibGroup,
-    LajnatAssignment,
-)
+from .models import *
 
 
 class StudentSerializer(serializers.ModelSerializer):
@@ -128,7 +118,7 @@ class MuaddibGroupSerializer(serializers.ModelSerializer):
     students = StudentSerializer(many=True, read_only=True)
 
     class Meta:
-        model = MuaddibGroup
+        model = MuaddibGroupAssignment
         fields = [
             "id",
             "hizb",

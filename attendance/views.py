@@ -8,17 +8,7 @@ from datetime import date, timedelta
 import logging
 logger = logging.getLogger(__name__)
 
-from .models import (
-    Student,
-    AttendanceRecord,
-    AttendanceFlag,
-    AuditLog,
-    Notification,
-    HizbAssignment,
-    MasoolAssignment,
-    MuaddibGroup,
-    LajnatAssignment,
-)
+from .models import *
 from .serializers import (
     AttendanceRecordSerializer,
     AttendanceFlagSerializer,
@@ -281,7 +271,7 @@ class RoleBasedDashboardView(APIView):
             })
 
         elif role == "muaddib":
-            groups = MuaddibGroup.objects.filter(muaddib=user)
+            groups = MuaddibGroupAssignment.objects.filter(muaddib=user)
             students = Student.objects.filter(muaddib_students__in=groups).distinct()
             records = AttendanceRecord.objects.filter(student__in=students)
             return Response({
@@ -409,7 +399,7 @@ class MuaddibGroupView(APIView):
         if not hizb or not muaddib_id or not student_ids:
             return Response({"message": "hizb, muaddib_id, and student_ids required"}, status=400)
 
-        group, created = MuaddibGroup.objects.update_or_create(
+        group, created = MuaddibGroupAssignment.objects.update_or_create(
             hizb=hizb,
             muaddib_id=muaddib_id,
             defaults={}

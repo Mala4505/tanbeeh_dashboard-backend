@@ -10,6 +10,7 @@ urlpatterns = [
     # --- API Routes (Versioned) ---
     path("api/v1/", include("login.urls")),       # 🔑 Authentication & User Management
     path("api/v1/", include("attendance.urls")),  # 📊 Attendance & Role Dashboards
+    path("api/v1/dashboard/", include("dashboard.urls")),  # 📊 Attendance & Role Dashboards
 ]
 
 # --- Static & Media (Development only) ---

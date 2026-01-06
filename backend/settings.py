@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'django_crontab',
     'login',
     'attendance',
+    'dashboard',
 ]
 
 
