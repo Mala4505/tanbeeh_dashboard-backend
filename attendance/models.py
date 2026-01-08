@@ -49,6 +49,11 @@ class Student(models.Model):
     hizb = models.ForeignKey(Hizb, on_delete=models.SET_NULL, null=True, blank=True, related_name="students")
     hizb_group = models.ForeignKey(HizbGroup, on_delete=models.SET_NULL, null=True, blank=True, related_name="students")
 
+    class Meta:
+        indexes = [
+            models.Index(fields=["darajah", "hizb", "hizb_group"]),
+        ]
+
     def __str__(self):
         return f"{self.trno} - {self.bed_name or ''}"
 
