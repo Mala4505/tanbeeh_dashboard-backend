@@ -15,6 +15,7 @@
 #         return f"{self.username} ({self.role})"
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from attendance.models import Darajah, Hizb, Student
 
 
 class CustomUser(AbstractUser):
@@ -32,16 +33,16 @@ class CustomUser(AbstractUser):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="staff")
     its_number = models.CharField(max_length=50, unique=True, null=True, blank=True)
 
-    # Extra fields for role-based assignments
-    hizb = models.CharField(max_length=50, null=True, blank=True)   # For Prefect/Deputy/Muaddib
-    room = models.CharField(max_length=50, null=True, blank=True)   # For Lajnat Member allocation
+    darajah = models.ForeignKey(Darajah, null=True, blank=True, on_delete=models.SET_NULL)
+    hizb = models.ForeignKey(Hizb, null=True, blank=True, on_delete=models.SET_NULL)
+    students = models.ManyToManyField(Student, blank=True, related_name="assigned_users")
 
     # Account management flags
     is_verified = models.BooleanField(default=False)  # Admin can mark user as verified
     is_active = models.BooleanField(default=True)     # Standard Django field, but explicitly kept
 
     USERNAME_FIELD = "its_number"
-    REQUIRED_FIELDS = ["role"]
+    REQUIRED_FIELDS = ["username","role"]
     
     def __str__(self):
         return f"({self.its_number})"

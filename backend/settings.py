@@ -150,7 +150,7 @@ CSRF_COOKIE_SECURE = True
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # your Vite dev server
-    "https://tanbeeh-dashboard-frontend.onrender.com",  # production frontend if deployed
+    "https://tanbeeh-dashboard-backend.onrender.com",  # production frontend if deployed
 ]
 CORS_ALLOW_CREDENTIALS = True
 
